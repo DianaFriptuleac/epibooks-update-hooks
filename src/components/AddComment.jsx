@@ -1,98 +1,81 @@
-import { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { useEffect, useState } from "react";
 
-const AddComment = ({asin, changeUpdateCommentsList})=> {
-  //state = {
-   // personalComment: {
-    //  comment: '',
-   //   rate: '',
-    //  elementId: this.props.asin,  //prendo this.props.asin da  fetch(`https://striveschool-api.herokuapp.com/api/comments/${this.props.asin}` del CommentArea
-   // }
-  //};
-
+const AddComment = ({ asin, changeUpdateCommentsList }) => {
   const [personalComment, setPersonalComment] = useState({
-    comment: '',
-    rate: '',
-    elementId: asin, 
-  })
-
-  //aggiorno elementId nel personalComment quando asin cambia
+    comment: "",
+    rate: "",
+    elementId: asin,
+  });
+//aggiorno elementId ogni volta che cambia la prop asin
   useEffect(() => {
-    setPersonalComment((prevComment) => ({
-      ...prevComment,
+    setPersonalComment((prev) => ({
+      ...prev,
       elementId: asin,
-    }))
-  },[asin])
-
+    }));
+  }, [asin]);
   //componentDidUpdate = (prevProps) => {
-    //if (prevProps.asin !== this.props.asin) {
+   // if (prevProps.asin !== this.props.asin) {
       // ora manteniamo aggiornato elementId in this.state.personalComment
      // this.setState({
-       // personalComment: {
-        //  ...this.state.personalComment,
-         // elementId: this.props.asin,
+     //   personalComment: {
+       //   ...this.state.personalComment,
+        //  elementId: this.props.asin,
           // ora l'asin nello state è aggiornato con il valore ricevuto nelle props
           // (valore che abbiamo ricevuto quando abbiamo cliccato su un nuovo libro)
-       // },
+        //},
      // });
-   // }
- // }
+    //}
+  //}
 
   const handleInputChange = (e, property) => {
+    setPersonalComment((prev) => ({
+      ...prev,
+      [property]: e.target.value,
+    }));
+  };
+
+ // handleInputChange = (e, property) => {
    // this.setState({
      // personalComment: {
-     //   ...this.state.personalComment,  //modo in cui trascinare qui dentro tutto il contenuto di un altro oggetto
+      //  ...this.state.personalComment,  //modo in cui trascinare qui dentro tutto il contenuto di un altro oggetto
       //  [property]: e.target.value,
-      //}
-    //});
+     // }
+   // });
+  //};
 
-    setPersonalComment((prevComment) =>({
-      ...prevComment,
-      [property]:e.target.value,
-    }))
-  };
-
- const handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submit chiamato con:", this.state.personalComment);
-    fetchComments()
- }
-const fetchComments = () =>{
     fetch("https://striveschool-api.herokuapp.com/api/comments/", {
-      method: 'POST',
-      headers: {
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NmEzNjJlYWYyNjBjYzAwMTVjYzBkZWUiLCJpYXQiOjE3MjQzMjc1NjQsImV4cCI6MTcyNTUzNzE2NH0.g888918CD5qke7EIIwh90BjBGeHnwAIHTubT-bzC7fI",
-        'Content-Type': 'application/json',  //sempre questo
-      },
-      body: JSON.stringify(this.state.personalComment),
-    })
-    .then((response) => {
-        console.log("Risposta della chiamata:", response);
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Errore nella chiamata API!");
-        }
+        method: "POST",
+        headers: {
+          Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NmEzNjJlYWYyNjBjYzAwMTVjYzBkZWUiLCJpYXQiOjE3MjQzMjc1NjQsImV4cCI6MTcyNTUzNzE2NH0.g888918CD5qke7EIIwh90BjBGeHnwAIHTubT-bzC7fI",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(personalComment),
       })
-      .then((data) => {
-        console.log("Dati ricevuti:", data);
-        alert('Commento salvato!');
-
-        changeUpdateCommentsList()
-        setPersonalComment({
-          personalComment: {
-            comment: '',
-            rate: '',
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Errore nella chiamata API!");
+          }
+        })
+        .then(() => {
+          alert("Commento salvato!");
+          changeUpdateCommentsList();
+          setPersonalComment({
+            comment: "",
+            rate: "",
             elementId: asin,
-          },
+          });
+        })
+        .catch((err) => {
+          console.error("Errore:", err);
+          alert("Errore: " + err.message);
         });
-      })
-      .catch((err) => {
-        console.error('Errore:', err);
-        alert('Errore: ' + err);
-      });
-  };
-
+    };
+  
     return (
       <Container>
         <Row>
@@ -102,7 +85,7 @@ const fetchComments = () =>{
                 <Form.Label>Punteggio</Form.Label>
                 <Form.Select
                   required
-                  onChange={(e) => handleInputChange(e, 'rate')}
+                  onChange={(e) => handleInputChange(e, "rate")}
                   value={personalComment.rate}
                 >
                   <option value="">Seleziona un voto</option>
@@ -113,14 +96,14 @@ const fetchComments = () =>{
                   <option value="5">5</option>
                 </Form.Select>
               </Form.Group>
-
+  
               <Form.Group>
                 <Form.Label>Scrivi il tuo commento</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
                   required
-                  onChange={(e) => handleInputChange(e, 'comment')}
+                  onChange={(e) => handleInputChange(e, "comment")}
                   value={personalComment.comment}
                 />
               </Form.Group>
@@ -134,7 +117,6 @@ const fetchComments = () =>{
         </Row>
       </Container>
     );
-  }
-
-
-export default AddComment;
+  };
+  
+  export default AddComment;
